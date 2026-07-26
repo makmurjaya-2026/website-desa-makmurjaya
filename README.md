@@ -278,4 +278,4 @@ FORMSPREE_ENDPOINT=https://formspree.io/f/xxxxx
 
 ## Lisensi
 
-Proyek ini dikembangkan untuk Desa Makmurjaya.
+Proyek ini dikembangkan untuk Desa Makmurjaya. Kredit kepada Tim KKN IPB 2026, Jeff146354
