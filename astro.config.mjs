@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://jeff146354.github.io',
+  site: 'https://makmurjaya-2026.github.io',
   base: '/website-desa-makmurjaya/',
   output: 'static',
   trailingSlash: 'ignore',
