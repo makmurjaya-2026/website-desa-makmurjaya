@@ -134,6 +134,11 @@ Pengelola → Decap CMS (/admin) → Netlify OAuth Proxy → GitHub OAuth → Ak
    - **Client ID**: (dari langkah 1)
    - **Client Secret**: (dari langkah 1)
 7. Klik **Install**
+8. **PENTING — Tambahkan Domain Alias:**
+   - Buka **Domain management** pada site Netlify yang sama
+   - Klik **Add domain alias**
+   - Tambahkan: `username.github.io` (hostname GitHub Pages Anda, contoh: `makmurjaya-2026.github.io`)
+   - Ini WAJIB karena Decap CMS mengirim hostname halaman (`window.location.hostname`) sebagai `site_id` ke Netlify API, bukan nilai `site_id` dari config. Tanpa domain alias ini, Netlify tidak mengenali request dan mengembalikan "Not Found".
 
 ### Langkah 3: Verifikasi Konfigurasi Decap CMS
 
@@ -193,6 +198,10 @@ Beberapa secret perlu dikonfigurasi agar workflow berjalan dengan benar:
 - Pastikan Client ID dan Secret di Netlify cocok dengan yang di GitHub
 - Pastikan `base_url` di `decap-cms/config.yml` adalah `https://api.netlify.com`
 - Pastikan `repo` di config CMS sesuai format `username/repo-name`
+- **KRITIS: Tambahkan domain alias di Netlify** — Decap CMS menggunakan `window.location.hostname` (bukan `site_id` dari config) saat mengirim request OAuth ke Netlify. Netlify harus mengenali hostname tersebut sebagai milik situs Anda.
+  - Buka Netlify → Site → Domain management → Add domain alias
+  - Tambahkan: `username.github.io` (hostname GitHub Pages Anda)
+  - Tanpa ini, Anda akan mendapat error "Not Found" saat login CMS
 
 ### Halaman 404 Setelah Deploy
 
@@ -209,6 +218,7 @@ Beberapa secret perlu dikonfigurasi agar workflow berjalan dengan benar:
 - [ ] `astro.config.mjs` memiliki `site` dan `base` yang sesuai
 - [ ] GitHub OAuth App dibuat dengan callback URL `https://api.netlify.com/auth/done`
 - [ ] Netlify dikonfigurasi sebagai OAuth proxy dengan Client ID/Secret
+- [ ] Netlify domain alias ditambahkan: `username.github.io` (WAJIB untuk CMS login)
 - [ ] `decap-cms/config.yml` memiliki `repo` yang benar
 - [ ] Secret `FORMSPREE_ENDPOINT` ditambahkan ke repository
 - [ ] Workflow deploy berhasil (cek tab Actions)
