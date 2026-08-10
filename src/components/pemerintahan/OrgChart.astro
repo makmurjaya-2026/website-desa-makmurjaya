@@ -1,20 +1,15 @@
 ---
 /**
  * OrgChart.astro
- * Menampilkan bagan struktur organisasi pemerintahan desa.
- * Renders a proper tree layout based on parent_slug relationships.
+ * Fixed structure org chart matching the official Desa Makmurjaya bagan.
+ * Structure is NOT dynamically generated — it is hardcoded to match the
+ * real org chart on the wall of the kantor desa.
  *
- * Structure is FIXED to match the official village org chart:
- * - BPD sits alongside Kepala Desa (advisory)
- * - Sekretaris Desa → Kaur Keuangan, Kaur Umum dan Perencanaan
- * - Kasi Pemerintahan → Operator
- * - Kasi Kesejahteraan (no children)
- * - Kasi Pelayanan (no children)
- * - Kepala Dusun: Kadus Karajan, Kadus Cibenda
- * - Penjaga dan Petugas Kebersihan Desa
+ * Names are pulled from perangkat-desa content collection.
+ * To change names: edit via CMS or markdown files.
+ * To change STRUCTURE: edit this component directly.
  */
-
-import PerangkatCard from './PerangkatCard.astro';
+import { getPath } from '../../utils/links';
 
 interface Perangkat {
   nama: string;
@@ -32,192 +27,268 @@ interface Props {
 
 const { perangkatList } = Astro.props;
 
-// Build tree from parent_slug relationships
-interface TreeNode extends Perangkat {
-  children: TreeNode[];
+// Helper to find person by slug
+function find(slug: string): Perangkat | undefined {
+  return perangkatList.find(p => p.slug === slug);
 }
 
-function buildTree(items: Perangkat[]): TreeNode[] {
-  const nodeMap = new Map<string, TreeNode>();
-  const roots: TreeNode[] = [];
-
-  for (const item of items) {
-    nodeMap.set(item.slug, { ...item, children: [] });
-  }
-
-  for (const item of items) {
-    const node = nodeMap.get(item.slug)!;
-    if (item.parent_slug && nodeMap.has(item.parent_slug)) {
-      nodeMap.get(item.parent_slug)!.children.push(node);
-    } else {
-      roots.push(node);
-    }
-  }
-
-  for (const node of nodeMap.values()) {
-    node.children.sort((a, b) => a.urutan - b.urutan);
-  }
-
-  return roots.sort((a, b) => a.urutan - b.urutan);
-}
-
-// Flatten for mobile
-interface FlatItem extends Perangkat {
-  depth: number;
-}
-
-function flattenTree(nodes: TreeNode[], depth: number = 0): FlatItem[] {
-  const result: FlatItem[] = [];
-  for (const node of nodes) {
-    result.push({ ...node, depth });
-    result.push(...flattenTree(node.children, depth + 1));
-  }
-  return result;
-}
-
-const tree = buildTree(perangkatList);
-const flatList = flattenTree(tree);
-
-// Find Kepala Desa (root)
-const kepalaDesa = tree.find(n => n.level_hierarki === 1);
-const directChildren = kepalaDesa?.children || [];
-
-// Group direct children
-const sekretaris = directChildren.find(c => c.slug === 'sekretaris-desa');
-const kasiList = directChildren.filter(c => c.jabatan.startsWith('Kasi'));
-const kadusAndOthers = directChildren.filter(c =>
-  !c.jabatan.startsWith('Kasi') && c.slug !== 'sekretaris-desa'
-);
+const kepalaDesa = find('kepala-desa');
+const sekretaris = find('sekretaris-desa');
+const kaurKeuangan = find('kaur-keuangan');
+const kaurUmum = find('kaur-umum-dan-perencanaan');
+const kasiPemerintahan = find('kasi-pemerintahan');
+const kasiKesejahteraan = find('kasi-kesejahteraan');
+const kasiPelayanan = find('kasi-pelayanan');
+const operator = find('operator');
+const kadusKarajan = find('kepala-dusun-karajan');
+const kadusCibenda = find('kepala-dusun-cibenda');
+const penjaga = find('penjaga-kebersihan-desa');
 ---
 
-{/* Desktop: Proper hierarchical tree layout */}
-<div class="hidden md:block" role="figure" aria-label="Bagan Struktur Organisasi Pemerintahan Desa">
-  <div class="flex flex-col items-center gap-0">
+{/* === DESKTOP VIEW === */}
+<div class="hidden md:block" role="figure" aria-label="Bagan Struktur Organisasi Pemerintahan Desa Makmurjaya">
 
-    {/* Level 1: Kepala Desa */}
-    {kepalaDesa && (
-      <div class="flex flex-col items-center">
-        <div class="max-w-xs w-full">
-          <PerangkatCard
-            nama={kepalaDesa.nama}
-            jabatan={kepalaDesa.jabatan}
-            slug={kepalaDesa.slug}
-            foto={kepalaDesa.foto}
-          />
-        </div>
-
-        {/* Vertical connector */}
-        <div class="w-px h-8 bg-line" aria-hidden="true"></div>
-
-        {/* Horizontal connector spanning all branches */}
-        <div class="w-full max-w-4xl h-px bg-line" aria-hidden="true"></div>
-      </div>
-    )}
-
-    {/* Level 2: Sekretaris + Kasi row */}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl">
-      {/* Sekretaris Desa branch */}
-      {sekretaris && (
-        <div class="flex flex-col items-center">
-          <div class="w-px h-6 bg-line" aria-hidden="true"></div>
-          <PerangkatCard
-            nama={sekretaris.nama}
-            jabatan={sekretaris.jabatan}
-            slug={sekretaris.slug}
-            foto={sekretaris.foto}
-          />
-          {/* Sekretaris children (Kaur) */}
-          {sekretaris.children.length > 0 && (
-            <div class="flex flex-col items-center w-full mt-1">
-              <div class="w-px h-4 bg-line" aria-hidden="true"></div>
-              <div class="space-y-2 w-full">
-                {sekretaris.children.map((kaur) => (
-                  <div class="flex flex-col items-center">
-                    <PerangkatCard
-                      nama={kaur.nama}
-                      jabatan={kaur.jabatan}
-                      slug={kaur.slug}
-                      foto={kaur.foto}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Kasi branches */}
-      {kasiList.map((kasi) => (
-        <div class="flex flex-col items-center">
-          <div class="w-px h-6 bg-line" aria-hidden="true"></div>
-          <PerangkatCard
-            nama={kasi.nama}
-            jabatan={kasi.jabatan}
-            slug={kasi.slug}
-            foto={kasi.foto}
-          />
-          {/* Kasi children (e.g. Operator under Kasi Pemerintahan) */}
-          {kasi.children.length > 0 && (
-            <div class="flex flex-col items-center w-full mt-1">
-              <div class="w-px h-4 bg-line" aria-hidden="true"></div>
-              <div class="space-y-2 w-full">
-                {kasi.children.map((child) => (
-                  <div class="flex flex-col items-center">
-                    <PerangkatCard
-                      nama={child.nama}
-                      jabatan={child.jabatan}
-                      slug={child.slug}
-                      foto={child.foto}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
+  {/* Row 1: BPD + Kepala Desa */}
+  <div class="flex justify-center items-center gap-8 mb-2">
+    <div class="border border-line rounded-lg px-4 py-2 text-center bg-white">
+      <p class="font-display font-semibold text-sm text-ink">BPD</p>
     </div>
+    <div class="w-12 h-px bg-line" aria-hidden="true"></div>
+    {kepalaDesa && (
+      <a href={getPath(`/pemerintahan/${kepalaDesa.slug}`)} class="block border-2 border-primary-700 rounded-xl px-6 py-3 text-center bg-white hover:shadow-elevated transition">
+        <p class="font-display font-bold text-base text-ink">{kepalaDesa.nama}</p>
+        <p class="text-xs text-muted">{kepalaDesa.jabatan}</p>
+      </a>
+    )}
+  </div>
 
-    {/* Level 3: Kadus and other staff */}
-    {kadusAndOthers.length > 0 && (
-      <div class="flex flex-col items-center w-full max-w-4xl mt-2">
-        <div class="w-px h-6 bg-line" aria-hidden="true"></div>
-        <div class="w-full max-w-2xl h-px bg-line" aria-hidden="true"></div>
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-3xl mt-2">
-          {kadusAndOthers.map((member) => (
-            <div class="flex flex-col items-center">
-              <PerangkatCard
-                nama={member.nama}
-                jabatan={member.jabatan}
-                slug={member.slug}
-                foto={member.foto}
-              />
-            </div>
-          ))}
+  {/* Vertical line from Kepala Desa */}
+  <div class="flex justify-center">
+    <div class="w-px h-8 bg-line" aria-hidden="true"></div>
+  </div>
+
+  {/* Row 2: Sekretaris Desa (right side, connected to Kepala Desa) */}
+  <div class="flex justify-center mb-2">
+    <div class="grid grid-cols-[1fr_auto_1fr] items-start gap-0 w-full max-w-5xl">
+      {/* Left: Kasi group connector */}
+      <div class="flex flex-col items-center">
+        <div class="w-full h-px bg-line" aria-hidden="true"></div>
+      </div>
+      {/* Center: vertical connector */}
+      <div class="flex flex-col items-center">
+        <div class="w-px h-0 bg-line" aria-hidden="true"></div>
+      </div>
+      {/* Right: Sekretaris */}
+      <div class="flex items-start">
+        <div class="w-12 h-px bg-line mt-5" aria-hidden="true"></div>
+        {sekretaris && (
+          <a href={getPath(`/pemerintahan/${sekretaris.slug}`)} class="block border border-primary-600 rounded-xl px-5 py-3 text-center bg-primary-50 hover:shadow-elevated transition">
+            <p class="font-display font-semibold text-sm text-ink">{sekretaris.nama}</p>
+            <p class="text-[11px] text-muted">{sekretaris.jabatan}</p>
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* Vertical line continues */}
+  <div class="flex justify-center">
+    <div class="w-px h-6 bg-line" aria-hidden="true"></div>
+  </div>
+
+  {/* Row 3: Kaur (under Sekretaris) + Kasi (under Kepala Desa) */}
+  <div class="flex justify-center mb-2">
+    <div class="grid grid-cols-2 gap-8 w-full max-w-5xl">
+      {/* Left half: 3 Kasi */}
+      <div>
+        <div class="flex justify-center mb-2">
+          <div class="w-3/4 h-px bg-line" aria-hidden="true"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          {kasiPemerintahan && (
+            <a href={getPath(`/pemerintahan/${kasiPemerintahan.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+              <p class="font-display font-semibold text-[13px] text-ink">{kasiPemerintahan.nama}</p>
+              <p class="text-[10px] text-muted">{kasiPemerintahan.jabatan}</p>
+            </a>
+          )}
+          {kasiKesejahteraan && (
+            <a href={getPath(`/pemerintahan/${kasiKesejahteraan.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+              <p class="font-display font-semibold text-[13px] text-ink">{kasiKesejahteraan.nama}</p>
+              <p class="text-[10px] text-muted">{kasiKesejahteraan.jabatan}</p>
+            </a>
+          )}
+          {kasiPelayanan && (
+            <a href={getPath(`/pemerintahan/${kasiPelayanan.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+              <p class="font-display font-semibold text-[13px] text-ink">{kasiPelayanan.nama}</p>
+              <p class="text-[10px] text-muted">{kasiPelayanan.jabatan}</p>
+            </a>
+          )}
         </div>
       </div>
-    )}
+
+      {/* Right half: 2 Kaur (under Sekretaris) */}
+      <div>
+        <div class="flex justify-center mb-2">
+          <div class="w-1/2 h-px bg-line" aria-hidden="true"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          {kaurKeuangan && (
+            <a href={getPath(`/pemerintahan/${kaurKeuangan.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+              <p class="font-display font-semibold text-[13px] text-ink">{kaurKeuangan.nama}</p>
+              <p class="text-[10px] text-muted">{kaurKeuangan.jabatan}</p>
+            </a>
+          )}
+          {kaurUmum && (
+            <a href={getPath(`/pemerintahan/${kaurUmum.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+              <p class="font-display font-semibold text-[13px] text-ink">{kaurUmum.nama}</p>
+              <p class="text-[10px] text-muted">{kaurUmum.jabatan}</p>
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Vertical lines down to bottom row */}
+  <div class="flex justify-center">
+    <div class="w-full max-w-5xl">
+      <div class="flex justify-center">
+        <div class="w-px h-8 bg-line" aria-hidden="true"></div>
+      </div>
+      <div class="w-3/4 mx-auto h-px bg-line" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  {/* Row 4: Bottom — Operator, Kadus Karajan, Penjaga, Kadus Cibenda */}
+  <div class="flex justify-center mt-2">
+    <div class="grid grid-cols-4 gap-3 w-full max-w-4xl">
+      {operator && (
+        <a href={getPath(`/pemerintahan/${operator.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+          <p class="font-display font-semibold text-[13px] text-ink">{operator.nama}</p>
+          <p class="text-[10px] text-muted">{operator.jabatan}</p>
+        </a>
+      )}
+      {kadusKarajan && (
+        <a href={getPath(`/pemerintahan/${kadusKarajan.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+          <p class="font-display font-semibold text-[13px] text-ink">{kadusKarajan.nama}</p>
+          <p class="text-[10px] text-muted">{kadusKarajan.jabatan}</p>
+        </a>
+      )}
+      {penjaga && (
+        <a href={getPath(`/pemerintahan/${penjaga.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+          <p class="font-display font-semibold text-[13px] text-ink">{penjaga.nama}</p>
+          <p class="text-[10px] text-muted">{penjaga.jabatan}</p>
+        </a>
+      )}
+      {kadusCibenda && (
+        <a href={getPath(`/pemerintahan/${kadusCibenda.slug}`)} class="block border border-line rounded-xl px-3 py-3 text-center bg-white hover:shadow-card transition">
+          <p class="font-display font-semibold text-[13px] text-ink">{kadusCibenda.nama}</p>
+          <p class="text-[10px] text-muted">{kadusCibenda.jabatan}</p>
+        </a>
+      )}
+    </div>
   </div>
 </div>
 
-{/* Mobile: Vertical tree with indentation */}
-<ul class="md:hidden space-y-1" role="list" aria-label="Daftar Struktur Organisasi Pemerintahan Desa">
-  {flatList.map((item) => (
-    <li
-      role="listitem"
-      style={`padding-left: ${item.depth * 1.25}rem;`}
-      class:list={[
-        'border-l-2',
-        item.depth === 0 ? 'border-primary-700' : item.depth === 1 ? 'border-primary-400' : 'border-primary-200',
-      ]}
-    >
-      <PerangkatCard
-        nama={item.nama}
-        jabatan={item.jabatan}
-        slug={item.slug}
-        foto={item.foto}
-      />
-    </li>
-  ))}
-</ul>
+{/* === MOBILE VIEW === */}
+<div class="md:hidden space-y-1" role="list" aria-label="Struktur Organisasi Pemerintahan Desa">
+  {/* Kepala Desa */}
+  {kepalaDesa && (
+    <a href={getPath(`/pemerintahan/${kepalaDesa.slug}`)} class="block border-2 border-primary-700 rounded-xl px-4 py-3 bg-white">
+      <p class="font-display font-bold text-sm text-ink">{kepalaDesa.nama}</p>
+      <p class="text-[11px] text-muted">{kepalaDesa.jabatan}</p>
+    </a>
+  )}
+
+  {/* Sekretaris */}
+  {sekretaris && (
+    <div class="pl-4 border-l-2 border-primary-400">
+      <a href={getPath(`/pemerintahan/${sekretaris.slug}`)} class="block border border-primary-300 rounded-xl px-4 py-2.5 bg-primary-50">
+        <p class="font-display font-semibold text-[13px] text-ink">{sekretaris.nama}</p>
+        <p class="text-[10px] text-muted">{sekretaris.jabatan}</p>
+      </a>
+      {/* Kaur under Sekretaris */}
+      <div class="pl-4 mt-1 space-y-1 border-l-2 border-primary-200">
+        {kaurKeuangan && (
+          <a href={getPath(`/pemerintahan/${kaurKeuangan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+            <p class="font-semibold text-[12px] text-ink">{kaurKeuangan.nama}</p>
+            <p class="text-[10px] text-muted">{kaurKeuangan.jabatan}</p>
+          </a>
+        )}
+        {kaurUmum && (
+          <a href={getPath(`/pemerintahan/${kaurUmum.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+            <p class="font-semibold text-[12px] text-ink">{kaurUmum.nama}</p>
+            <p class="text-[10px] text-muted">{kaurUmum.jabatan}</p>
+          </a>
+        )}
+      </div>
+    </div>
+  )}
+
+  {/* Kasi Pemerintahan + Operator */}
+  {kasiPemerintahan && (
+    <div class="pl-4 border-l-2 border-primary-400">
+      <a href={getPath(`/pemerintahan/${kasiPemerintahan.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+        <p class="font-display font-semibold text-[13px] text-ink">{kasiPemerintahan.nama}</p>
+        <p class="text-[10px] text-muted">{kasiPemerintahan.jabatan}</p>
+      </a>
+      {operator && (
+        <div class="pl-4 mt-1 border-l-2 border-primary-200">
+          <a href={getPath(`/pemerintahan/${operator.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+            <p class="font-semibold text-[12px] text-ink">{operator.nama}</p>
+            <p class="text-[10px] text-muted">{operator.jabatan}</p>
+          </a>
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* Kasi Kesejahteraan */}
+  {kasiKesejahteraan && (
+    <div class="pl-4 border-l-2 border-primary-400">
+      <a href={getPath(`/pemerintahan/${kasiKesejahteraan.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+        <p class="font-display font-semibold text-[13px] text-ink">{kasiKesejahteraan.nama}</p>
+        <p class="text-[10px] text-muted">{kasiKesejahteraan.jabatan}</p>
+      </a>
+    </div>
+  )}
+
+  {/* Kasi Pelayanan */}
+  {kasiPelayanan && (
+    <div class="pl-4 border-l-2 border-primary-400">
+      <a href={getPath(`/pemerintahan/${kasiPelayanan.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+        <p class="font-display font-semibold text-[13px] text-ink">{kasiPelayanan.nama}</p>
+        <p class="text-[10px] text-muted">{kasiPelayanan.jabatan}</p>
+      </a>
+    </div>
+  )}
+
+  {/* Kepala Dusun */}
+  <div class="pl-4 border-l-2 border-primary-400">
+    <p class="text-[11px] font-semibold text-muted uppercase tracking-wide py-1">Kepala Dusun</p>
+    <div class="pl-4 space-y-1 border-l-2 border-primary-200">
+      {kadusKarajan && (
+        <a href={getPath(`/pemerintahan/${kadusKarajan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+          <p class="font-semibold text-[12px] text-ink">{kadusKarajan.nama}</p>
+          <p class="text-[10px] text-muted">{kadusKarajan.jabatan}</p>
+        </a>
+      )}
+      {kadusCibenda && (
+        <a href={getPath(`/pemerintahan/${kadusCibenda.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+          <p class="font-semibold text-[12px] text-ink">{kadusCibenda.nama}</p>
+          <p class="text-[10px] text-muted">{kadusCibenda.jabatan}</p>
+        </a>
+      )}
+    </div>
+  </div>
+
+  {/* Penjaga */}
+  {penjaga && (
+    <div class="pl-4 border-l-2 border-primary-400">
+      <a href={getPath(`/pemerintahan/${penjaga.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+        <p class="font-display font-semibold text-[13px] text-ink">{penjaga.nama}</p>
+        <p class="text-[10px] text-muted">{penjaga.jabatan}</p>
+      </a>
+    </div>
+  )}
+</div>
