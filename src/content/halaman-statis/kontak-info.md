@@ -11,7 +11,7 @@ Jl. Raya Bendajaya No 288, Desa Makmurjaya, Kecamatan Jayakerta, Kabupaten Karaw
 
 ## Telepon
 
-(0271) 123-4567
+\-
 
 ## Email
 
@@ -21,5 +21,5 @@ desa.makmurjaya@gmail.com
 
 | Hari           | Jam               |
 | -------------- | ----------------- |
-| Senin - Jumat  | 07.45 - 15.45 WIB |
+| Senin - Jumat  | 09.00 - 15.00 WIB |
 | Sabtu - Minggu | Tutup             |
