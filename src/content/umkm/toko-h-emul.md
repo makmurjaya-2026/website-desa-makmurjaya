@@ -1,14 +1,15 @@
 ---
-nama_usaha: "Toko H. Emul"
-pemilik: "H. Emul"
-kategori: "Kuliner"
-jenis_produk: "Rengginang dan Kue Tradisional"
-harga_range: "Rp 5.000 - Rp 80.000"
+nama_usaha: Toko H. Emul
+slug: rengginang-emul
+pemilik: H. Emul
+kategori: Kuliner
+jenis_produk: Rengginang dan Kue Tradisional
 kontak_wa: "6285888647245"
-alamat: "Desa Makmurjaya, Kec. Jayakerta, Kab. Karawang"
+alamat: Desa Makmurjaya, Kec. Jayakerta, Kab. Karawang
+lokasi_gmaps: https://maps.app.goo.gl/Ku4exJ64tPd57jio6
 lokasi_lat: -6.122316975154832
+harga_range: Rp 5.000 - Rp 80.000
 lokasi_lng: 107.32397268465785
-lokasi_gmaps: "https://maps.app.goo.gl/Ku4exJ64tPd57jio6"
 ---
 
 Toko H. Emul menyediakan berbagai macam rengginang dan kue tradisional khas Karawang.
