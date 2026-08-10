@@ -1,9 +1,9 @@
 ---
-nama: "Dewi Lestari"
-jabatan: "Kasi Kesejahteraan"
+nama: Hj. NINING NURNANINGSIH S.Pd
+slug: kepala-desa
+jabatan: Kepala Desa
 urutan: 4
 level_hierarki: 3
-parent_slug: "sekretaris-desa"
+parent_slug: kepala-desa
 ---
-
-Dewi Lestari menjabat sebagai Kepala Seksi Kesejahteraan, bertanggung jawab atas program kesejahteraan masyarakat desa.
+\--
