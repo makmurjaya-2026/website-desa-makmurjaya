@@ -1,8 +1,8 @@
 ---
 /**
  * OrgChart.astro
- * Fixed structure org chart matching the official Desa Makmurjaya bagan.
- * Names are pulled from perangkat-desa content collection.
+ * Fixed structure org chart matching the official Desa Makmurjaya bagan exactly.
+ * Structure is hardcoded. Names come from content collection.
  */
 import { getPath } from '../../utils/links';
 
@@ -39,126 +39,113 @@ const kadusCibenda = find('kepala-dusun-cibenda');
 const penjaga = find('penjaga-kebersihan-desa');
 ---
 
-{/* === DESKTOP VIEW === */}
-<div class="hidden md:block" role="figure" aria-label="Bagan Struktur Organisasi Pemerintahan Desa Makmurjaya">
-  <div class="org-chart">
+{/* === DESKTOP === */}
+<div class="hidden md:block overflow-x-auto" role="figure" aria-label="Bagan Struktur Organisasi Pemerintahan Desa Makmurjaya">
+  <div class="min-w-[750px] max-w-4xl mx-auto py-6 px-4">
 
-    {/* Row 1: BPD + Kepala Desa */}
-    <div class="flex justify-center items-center gap-6">
-      <div class="org-box-bpd">BPD</div>
-      <div class="org-line-h w-10"></div>
+    {/* === ROW 1: BPD + KEPALA DESA === */}
+    <div class="flex items-center justify-center gap-4 mb-0">
+      <div class="shrink-0 border border-ink/30 rounded-lg px-5 py-2 text-center">
+        <span class="font-display font-bold text-sm text-ink">BPD</span>
+      </div>
+      <div class="w-8 border-t-2 border-ink/20"></div>
       {kepalaDesa && (
-        <a href={getPath(`/pemerintahan/${kepalaDesa.slug}`)} class="org-box-top">
-          <span class="org-name-lg">{kepalaDesa.nama}</span>
-          <span class="org-role">{kepalaDesa.jabatan}</span>
+        <a href={getPath(`/pemerintahan/${kepalaDesa.slug}`)} class="shrink-0 border-2 border-primary-700 rounded-xl px-6 py-3 text-center bg-white shadow-sm hover:shadow-elevated transition">
+          <p class="font-display font-bold text-base text-ink">{kepalaDesa.nama}</p>
+          <p class="text-xs text-muted">{kepalaDesa.jabatan}</p>
         </a>
       )}
     </div>
 
-    {/* Vertical connector */}
-    <div class="org-center"><div class="org-line-v h-10"></div></div>
-
-    {/* Split: Left goes to Kasi, Right goes to Sekretaris */}
-    <div class="relative flex justify-center">
-      {/* Main horizontal line spanning both sides */}
-      <div class="org-line-h w-[70%]"></div>
-    </div>
-
-    {/* Row 2: Two branches */}
-    <div class="grid grid-cols-[3fr_2fr] gap-6 mt-0">
-
-      {/* LEFT BRANCH: Kasi (under Kepala Desa directly) */}
-      <div class="flex flex-col items-center">
-        <div class="org-line-v h-8"></div>
-        <div class="text-[10px] font-semibold uppercase tracking-wider text-muted mb-2">Kepala Seksi</div>
-        <div class="grid grid-cols-3 gap-3 w-full">
-          {kasiPemerintahan && (
-            <a href={getPath(`/pemerintahan/${kasiPemerintahan.slug}`)} class="org-box">
-              <span class="org-name">{kasiPemerintahan.nama}</span>
-              <span class="org-role">{kasiPemerintahan.jabatan}</span>
-            </a>
-          )}
-          {kasiKesejahteraan && (
-            <a href={getPath(`/pemerintahan/${kasiKesejahteraan.slug}`)} class="org-box">
-              <span class="org-name">{kasiKesejahteraan.nama}</span>
-              <span class="org-role">{kasiKesejahteraan.jabatan}</span>
-            </a>
-          )}
-          {kasiPelayanan && (
-            <a href={getPath(`/pemerintahan/${kasiPelayanan.slug}`)} class="org-box">
-              <span class="org-name">{kasiPelayanan.nama}</span>
-              <span class="org-role">{kasiPelayanan.jabatan}</span>
-            </a>
-          )}
-        </div>
-      </div>
-
-      {/* RIGHT BRANCH: Sekretaris → Kaur */}
-      <div class="flex flex-col items-center">
-        <div class="org-line-v h-8"></div>
-        {sekretaris && (
-          <a href={getPath(`/pemerintahan/${sekretaris.slug}`)} class="org-box-sekretaris">
-            <span class="org-name">{sekretaris.nama}</span>
-            <span class="org-role">{sekretaris.jabatan}</span>
-          </a>
-        )}
-        <div class="org-line-v h-6"></div>
-        <div class="text-[10px] font-semibold uppercase tracking-wider text-muted mb-2">Kepala Urusan</div>
-        <div class="grid grid-cols-2 gap-3 w-full">
-          {kaurKeuangan && (
-            <a href={getPath(`/pemerintahan/${kaurKeuangan.slug}`)} class="org-box">
-              <span class="org-name">{kaurKeuangan.nama}</span>
-              <span class="org-role">{kaurKeuangan.jabatan}</span>
-            </a>
-          )}
-          {kaurUmum && (
-            <a href={getPath(`/pemerintahan/${kaurUmum.slug}`)} class="org-box">
-              <span class="org-name">{kaurUmum.nama}</span>
-              <span class="org-role">{kaurUmum.jabatan}</span>
-            </a>
-          )}
-        </div>
-      </div>
-    </div>
-
-    {/* Connector to bottom row */}
-    <div class="org-center mt-4"><div class="org-line-v h-8"></div></div>
+    {/* Vertical line down from Kepala Desa */}
     <div class="flex justify-center">
-      <div class="org-line-h w-[80%]"></div>
+      <div class="w-0.5 h-10 bg-ink/15"></div>
     </div>
 
-    {/* Row 3: Bottom staff */}
-    <div class="grid grid-cols-4 gap-3 mt-3 max-w-3xl mx-auto">
-      {operator && (
-        <a href={getPath(`/pemerintahan/${operator.slug}`)} class="org-box">
-          <span class="org-name">{operator.nama}</span>
-          <span class="org-role">{operator.jabatan}</span>
-        </a>
-      )}
-      {kadusKarajan && (
-        <a href={getPath(`/pemerintahan/${kadusKarajan.slug}`)} class="org-box">
-          <span class="org-name">{kadusKarajan.nama}</span>
-          <span class="org-role">{kadusKarajan.jabatan}</span>
-        </a>
-      )}
-      {penjaga && (
-        <a href={getPath(`/pemerintahan/${penjaga.slug}`)} class="org-box">
-          <span class="org-name">{penjaga.nama}</span>
-          <span class="org-role">{penjaga.jabatan}</span>
-        </a>
-      )}
-      {kadusCibenda && (
-        <a href={getPath(`/pemerintahan/${kadusCibenda.slug}`)} class="org-box">
-          <span class="org-name">{kadusCibenda.nama}</span>
-          <span class="org-role">{kadusCibenda.jabatan}</span>
-        </a>
-      )}
+    {/* === ROW 2: SEKRETARIS DESA (right) + branch line to KASI (left) === */}
+    {/* This row shows: a horizontal line splitting left (to kasi) and right (to sekretaris) */}
+    <div class="relative">
+      {/* Horizontal connector bar */}
+      <div class="absolute top-0 left-[15%] right-[15%] border-t-2 border-ink/15"></div>
+
+      <div class="grid grid-cols-[1fr_1fr] gap-0 pt-0">
+        {/* LEFT: vertical drop to Kasi row */}
+        <div class="flex justify-center">
+          <div class="w-0.5 h-10 bg-ink/15"></div>
+        </div>
+        {/* RIGHT: Sekretaris Desa */}
+        <div class="flex justify-center">
+          <div class="flex flex-col items-center">
+            <div class="w-0.5 h-4 bg-ink/15"></div>
+            {sekretaris && (
+              <a href={getPath(`/pemerintahan/${sekretaris.slug}`)} class="border-2 border-primary-500 rounded-xl px-5 py-2.5 text-center bg-primary-50/60 hover:shadow-card transition">
+                <p class="font-display font-semibold text-sm text-ink">{sekretaris.nama}</p>
+                <p class="text-[11px] text-muted">{sekretaris.jabatan}</p>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
+
+    {/* === ROW 3: KASI (left side) + KAUR (right side under sekretaris) === */}
+    <div class="grid grid-cols-[1fr_1fr] gap-6">
+      {/* LEFT: 3 Kasi */}
+      <div>
+        {/* Horizontal connector above kasi */}
+        <div class="flex justify-center mb-1">
+          <div class="w-[80%] border-t-2 border-ink/15"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          {[kasiPemerintahan, kasiKesejahteraan, kasiPelayanan].map((kasi) => kasi && (
+            <a href={getPath(`/pemerintahan/${kasi.slug}`)} class="flex flex-col items-center border border-line rounded-lg px-2 py-2.5 text-center bg-white hover:border-primary-300 transition">
+              <p class="font-display font-semibold text-xs text-ink leading-tight">{kasi.nama}</p>
+              <p class="text-[10px] text-muted leading-tight mt-0.5">{kasi.jabatan}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* RIGHT: 2 Kaur (under Sekretaris) */}
+      <div>
+        <div class="flex justify-center">
+          <div class="w-0.5 h-6 bg-ink/15"></div>
+        </div>
+        <div class="flex justify-center mb-1">
+          <div class="w-[70%] border-t-2 border-ink/15"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          {[kaurKeuangan, kaurUmum].map((kaur) => kaur && (
+            <a href={getPath(`/pemerintahan/${kaur.slug}`)} class="flex flex-col items-center border border-line rounded-lg px-2 py-2.5 text-center bg-white hover:border-primary-300 transition">
+              <p class="font-display font-semibold text-xs text-ink leading-tight">{kaur.nama}</p>
+              <p class="text-[10px] text-muted leading-tight mt-0.5">{kaur.jabatan}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* === ROW 4: Bottom row (Operator, Kadus, Penjaga) === */}
+    <div class="flex justify-center mt-4">
+      <div class="w-0.5 h-8 bg-ink/15"></div>
+    </div>
+    <div class="flex justify-center mb-2">
+      <div class="w-[70%] border-t-2 border-ink/15"></div>
+    </div>
+    <div class="grid grid-cols-4 gap-2 max-w-2xl mx-auto">
+      {[operator, kadusKarajan, penjaga, kadusCibenda].map((p) => p && (
+        <a href={getPath(`/pemerintahan/${p.slug}`)} class="flex flex-col items-center border border-line rounded-lg px-2 py-2.5 text-center bg-white hover:border-primary-300 transition">
+          <p class="font-display font-semibold text-xs text-ink leading-tight">{p.nama}</p>
+          <p class="text-[10px] text-muted leading-tight mt-0.5">{p.jabatan}</p>
+        </a>
+      ))}
+    </div>
+
   </div>
 </div>
 
-{/* === MOBILE VIEW === */}
-<div class="md:hidden space-y-1.5" role="list" aria-label="Struktur Organisasi Pemerintahan Desa">
+{/* === MOBILE === */}
+<div class="md:hidden space-y-1.5 px-2" role="list" aria-label="Struktur Organisasi Pemerintahan Desa">
   {kepalaDesa && (
     <a href={getPath(`/pemerintahan/${kepalaDesa.slug}`)} class="block border-2 border-primary-700 rounded-xl px-4 py-3 bg-white">
       <p class="font-display font-bold text-[15px] text-ink">{kepalaDesa.nama}</p>
@@ -167,36 +154,30 @@ const penjaga = find('penjaga-kebersihan-desa');
   )}
 
   {sekretaris && (
-    <div class="pl-4 border-l-2 border-primary-500">
-      <a href={getPath(`/pemerintahan/${sekretaris.slug}`)} class="block border border-primary-300 rounded-xl px-4 py-2.5 bg-primary-50">
+    <div class="ml-4 border-l-2 border-primary-400 pl-3">
+      <a href={getPath(`/pemerintahan/${sekretaris.slug}`)} class="block border border-primary-300 rounded-lg px-3 py-2 bg-primary-50/60">
         <p class="font-display font-semibold text-[13px] text-ink">{sekretaris.nama}</p>
         <p class="text-[10px] text-muted">{sekretaris.jabatan}</p>
       </a>
-      <div class="pl-4 mt-1 space-y-1 border-l-2 border-primary-200">
-        {kaurKeuangan && (
-          <a href={getPath(`/pemerintahan/${kaurKeuangan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
-            <p class="font-semibold text-[12px] text-ink">{kaurKeuangan.nama}</p>
-            <p class="text-[10px] text-muted">{kaurKeuangan.jabatan}</p>
+      <div class="ml-3 mt-1 space-y-1 border-l-2 border-primary-200 pl-3">
+        {[kaurKeuangan, kaurUmum].map((kaur) => kaur && (
+          <a href={getPath(`/pemerintahan/${kaur.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+            <p class="font-semibold text-[12px] text-ink">{kaur.nama}</p>
+            <p class="text-[10px] text-muted">{kaur.jabatan}</p>
           </a>
-        )}
-        {kaurUmum && (
-          <a href={getPath(`/pemerintahan/${kaurUmum.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
-            <p class="font-semibold text-[12px] text-ink">{kaurUmum.nama}</p>
-            <p class="text-[10px] text-muted">{kaurUmum.jabatan}</p>
-          </a>
-        )}
+        ))}
       </div>
     </div>
   )}
 
   {kasiPemerintahan && (
-    <div class="pl-4 border-l-2 border-primary-500">
-      <a href={getPath(`/pemerintahan/${kasiPemerintahan.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+    <div class="ml-4 border-l-2 border-primary-400 pl-3">
+      <a href={getPath(`/pemerintahan/${kasiPemerintahan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
         <p class="font-display font-semibold text-[13px] text-ink">{kasiPemerintahan.nama}</p>
         <p class="text-[10px] text-muted">{kasiPemerintahan.jabatan}</p>
       </a>
       {operator && (
-        <div class="pl-4 mt-1 border-l-2 border-primary-200">
+        <div class="ml-3 mt-1 border-l-2 border-primary-200 pl-3">
           <a href={getPath(`/pemerintahan/${operator.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
             <p class="font-semibold text-[12px] text-ink">{operator.nama}</p>
             <p class="text-[10px] text-muted">{operator.jabatan}</p>
@@ -207,8 +188,8 @@ const penjaga = find('penjaga-kebersihan-desa');
   )}
 
   {kasiKesejahteraan && (
-    <div class="pl-4 border-l-2 border-primary-500">
-      <a href={getPath(`/pemerintahan/${kasiKesejahteraan.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+    <div class="ml-4 border-l-2 border-primary-400 pl-3">
+      <a href={getPath(`/pemerintahan/${kasiKesejahteraan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
         <p class="font-display font-semibold text-[13px] text-ink">{kasiKesejahteraan.nama}</p>
         <p class="text-[10px] text-muted">{kasiKesejahteraan.jabatan}</p>
       </a>
@@ -216,75 +197,32 @@ const penjaga = find('penjaga-kebersihan-desa');
   )}
 
   {kasiPelayanan && (
-    <div class="pl-4 border-l-2 border-primary-500">
-      <a href={getPath(`/pemerintahan/${kasiPelayanan.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+    <div class="ml-4 border-l-2 border-primary-400 pl-3">
+      <a href={getPath(`/pemerintahan/${kasiPelayanan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
         <p class="font-display font-semibold text-[13px] text-ink">{kasiPelayanan.nama}</p>
         <p class="text-[10px] text-muted">{kasiPelayanan.jabatan}</p>
       </a>
     </div>
   )}
 
-  <div class="pl-4 border-l-2 border-primary-500">
+  <div class="ml-4 border-l-2 border-primary-400 pl-3">
     <p class="text-[10px] font-semibold text-muted uppercase tracking-wide py-1">Kepala Dusun</p>
-    <div class="pl-4 space-y-1 border-l-2 border-primary-200">
-      {kadusKarajan && (
-        <a href={getPath(`/pemerintahan/${kadusKarajan.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
-          <p class="font-semibold text-[12px] text-ink">{kadusKarajan.nama}</p>
-          <p class="text-[10px] text-muted">{kadusKarajan.jabatan}</p>
+    <div class="ml-3 space-y-1 border-l-2 border-primary-200 pl-3">
+      {[kadusKarajan, kadusCibenda].map((kadus) => kadus && (
+        <a href={getPath(`/pemerintahan/${kadus.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
+          <p class="font-semibold text-[12px] text-ink">{kadus.nama}</p>
+          <p class="text-[10px] text-muted">{kadus.jabatan}</p>
         </a>
-      )}
-      {kadusCibenda && (
-        <a href={getPath(`/pemerintahan/${kadusCibenda.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
-          <p class="font-semibold text-[12px] text-ink">{kadusCibenda.nama}</p>
-          <p class="text-[10px] text-muted">{kadusCibenda.jabatan}</p>
-        </a>
-      )}
+      ))}
     </div>
   </div>
 
   {penjaga && (
-    <div class="pl-4 border-l-2 border-primary-500">
-      <a href={getPath(`/pemerintahan/${penjaga.slug}`)} class="block border border-line rounded-xl px-4 py-2.5 bg-white">
+    <div class="ml-4 border-l-2 border-primary-400 pl-3">
+      <a href={getPath(`/pemerintahan/${penjaga.slug}`)} class="block border border-line rounded-lg px-3 py-2 bg-white">
         <p class="font-display font-semibold text-[13px] text-ink">{penjaga.nama}</p>
         <p class="text-[10px] text-muted">{penjaga.jabatan}</p>
       </a>
     </div>
   )}
 </div>
-
-<style>
-  /* Org chart specific styles */
-  .org-chart {
-    @apply py-4;
-  }
-  .org-center {
-    @apply flex justify-center;
-  }
-  .org-line-v {
-    @apply w-[2px] bg-primary-300 mx-auto;
-  }
-  .org-line-h {
-    @apply h-[2px] bg-primary-300;
-  }
-  .org-box-bpd {
-    @apply border-2 border-primary-300 rounded-xl px-6 py-2.5 text-center font-display font-bold text-sm text-ink bg-white shadow-card;
-  }
-  .org-box-top {
-    @apply flex flex-col items-center border-2 border-primary-700 rounded-2xl px-8 py-4 text-center bg-white shadow-elevated hover:shadow-card transition;
-  }
-  .org-box-sekretaris {
-    @apply flex flex-col items-center border-2 border-primary-500 rounded-xl px-5 py-3 text-center bg-primary-50 hover:shadow-card transition;
-  }
-  .org-box {
-    @apply flex flex-col items-center border border-line rounded-xl px-4 py-3 text-center bg-white hover:border-primary-300 hover:shadow-card transition;
-  }
-  .org-name-lg {
-    @apply font-display font-bold text-[16px] text-ink leading-tight;
-  }
-  .org-name {
-    @apply font-display font-semibold text-[13px] text-ink leading-tight;
-  }
-  .org-role {
-    @apply text-[11px] text-muted mt-0.5 leading-tight;
-  }
-</style>

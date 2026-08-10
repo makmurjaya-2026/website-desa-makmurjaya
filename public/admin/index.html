@@ -112,6 +112,9 @@
               { label: 'Range Harga', name: 'harga_range', widget: 'string', required: false, hint: 'Contoh: Rp 15.000 - Rp 50.000' },
               { label: 'Nomor WhatsApp', name: 'kontak_wa', widget: 'string', hint: 'Format: 628XXXXXXXXX (tanpa spasi, tanda plus, atau tanda hubung)' },
               { label: 'Alamat', name: 'alamat', widget: 'string', required: false },
+              { label: 'Latitude Lokasi', name: 'lokasi_lat', widget: 'number', required: false, value_type: 'float', hint: 'Koordinat latitude dari Google Maps (contoh: -6.122)' },
+              { label: 'Longitude Lokasi', name: 'lokasi_lng', widget: 'number', required: false, value_type: 'float', hint: 'Koordinat longitude dari Google Maps (contoh: 107.325)' },
+              { label: 'Link Google Maps', name: 'lokasi_gmaps', widget: 'string', required: false, hint: 'Link Google Maps ke lokasi usaha' },
               { label: 'Foto Utama', name: 'foto_utama', widget: 'image', required: false, hint: 'Maks 5MB. Format: JPG, PNG, WebP' },
               { label: 'Galeri Produk', name: 'galeri_foto', widget: 'list', field: { label: 'Foto', name: 'foto', widget: 'image' }, required: false },
               { label: 'Deskripsi Usaha', name: 'body', widget: 'markdown' }
