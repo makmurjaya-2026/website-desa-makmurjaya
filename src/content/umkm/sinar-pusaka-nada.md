@@ -6,6 +6,9 @@ jenis_produk: "Singa Dangdut"
 harga_range: ""
 kontak_wa: "6285777144492"
 alamat: "Desa Makmurjaya, Kec. Jayakerta, Kab. Karawang"
+lokasi_lat: -6.122318768717835
+lokasi_lng: 107.32798044644082
+lokasi_gmaps: "https://maps.app.goo.gl/iGuN13tHLAWPT7vg9"
 ---
 
 Sinar Pusaka Nada (SPN) adalah grup seni singa dangdut dari Desa Makmurjaya. Menyediakan jasa hiburan singa dangdut untuk berbagai acara.

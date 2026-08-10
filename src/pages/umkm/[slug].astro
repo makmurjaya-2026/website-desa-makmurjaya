@@ -32,6 +32,9 @@ const {
   alamat,
   foto_utama,
   galeri_foto,
+  lokasi_lat,
+  lokasi_lng,
+  lokasi_gmaps,
 } = entry.data;
 
 // Strip non-numeric characters from WhatsApp number for wa.me link
@@ -180,6 +183,63 @@ const breadcrumbItems = [
           </div>
         </section>
       )}
+
+      {/* Peta Lokasi */}
+      {lokasi_lat && lokasi_lng && (
+        <section class="mt-10" aria-labelledby="lokasi-heading">
+          <div class="flex items-center justify-between mb-4">
+            <h2 id="lokasi-heading" class="h-section">Lokasi Usaha</h2>
+            {lokasi_gmaps && (
+              <a
+                href={lokasi_gmaps}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-ghost text-[13px]"
+              >
+                Buka di Google Maps
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+              </a>
+            )}
+          </div>
+          <div
+            id="umkm-map"
+            class="w-full h-[300px] md:h-[400px] rounded-2xl border border-line overflow-hidden"
+            data-lat={lokasi_lat}
+            data-lng={lokasi_lng}
+            data-label={nama_usaha}
+          ></div>
+        </section>
+      )}
     </article>
   </div>
 </BaseLayout>
+
+{lokasi_lat && lokasi_lng && (
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script>
+    async function initUMKMMap() {
+      const mapEl = document.getElementById('umkm-map');
+      if (!mapEl) return;
+
+      const lat = parseFloat(mapEl.dataset.lat || '0');
+      const lng = parseFloat(mapEl.dataset.lng || '0');
+      const label = mapEl.dataset.label || '';
+
+      const L = await import('leaflet');
+
+      const map = L.map('umkm-map').setView([lat, lng], 16);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map);
+
+      L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup(`<strong>${label}</strong>`)
+        .openPopup();
+    }
+
+    initUMKMMap();
+  </script>
+)}

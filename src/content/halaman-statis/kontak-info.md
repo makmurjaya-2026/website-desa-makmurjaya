@@ -1,8 +1,8 @@
 ---
 judul: Informasi Kontak Desa Makmurjaya
 tipe: kontak-info
-lokasi_lat: -7.5671
-lokasi_lng: 110.8241
+lokasi_lat: -6.1213
+lokasi_lng: 107.3280
 lokasi_label: Kantor Desa Makmurjaya
 ---
 ## Alamat
