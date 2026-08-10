@@ -59,8 +59,8 @@ const umkmCollection = defineCollection({
     lokasi_lat: z.number().optional(),
     lokasi_lng: z.number().optional(),
     lokasi_gmaps: z.string().optional(),
-    foto_utama: image().optional(),
-    galeri_foto: z.array(image()).default([]),
+    foto_utama: z.string().optional(),
+    galeri_foto: z.array(z.string()).default([]),
   }),
 });
 

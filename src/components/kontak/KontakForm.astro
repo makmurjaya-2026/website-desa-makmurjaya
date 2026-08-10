@@ -13,6 +13,14 @@
   novalidate
   aria-label="Formulir Kontak"
 >
+  {/* Disclaimer */}
+  <div class="rounded-xl bg-gold-50 border border-gold-100 px-4 py-3 flex items-start gap-3">
+    <svg class="w-5 h-5 text-gold-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+    <div>
+      <p class="text-[13px] font-semibold text-ink">Formulir ini belum aktif</p>
+      <p class="text-[12px] text-muted mt-0.5">Fitur pengiriman pesan sedang dalam tahap pengembangan. Untuk saat ini, silakan hubungi kantor desa secara langsung.</p>
+    </div>
+  </div>
   {/* Honeypot anti-spam field — hidden off-screen via CSS */}
   <div class="kontak-form__hp" aria-hidden="true" tabindex={-1}>
     <label for="kontak-website">Jangan isi kolom ini</label>
@@ -114,6 +122,7 @@
     <button
       type="submit"
       id="kontak-submit"
+      disabled
       class="inline-flex items-center gap-2 rounded-md bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <span id="kontak-submit-text">Kirim Pesan</span>

@@ -10,6 +10,7 @@ lokasi_gmaps: https://maps.app.goo.gl/Ku4exJ64tPd57jio6
 lokasi_lat: -6.122316975154832
 harga_range: Rp 5.000 - Rp 80.000
 lokasi_lng: 107.32397268465785
+foto_utama: "/website-desa-makmurjaya/uploads/rengginang-emul.png"
 ---
 
 Toko H. Emul menyediakan berbagai macam rengginang dan kue tradisional khas Karawang.

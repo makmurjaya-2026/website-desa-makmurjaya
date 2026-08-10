@@ -7,7 +7,6 @@
  *
  * Validates: Requirements 7.1
  */
-import { Image } from 'astro:assets';
 import { getPath } from '../../utils/links';
 
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
   pemilik?: string;
   harga_range?: string;
   kontak_wa?: string;
-  foto_utama?: ImageMetadata;
+  foto_utama?: string;
 }
 
 const { nama_usaha, slug, kategori, pemilik, harga_range, kontak_wa, foto_utama } = Astro.props;
@@ -28,11 +27,9 @@ const kontakWaNumeric = kontak_wa ? kontak_wa.replace(/\D/g, '') : '';
   {/* Image area */}
   <div class="aspect-[4/3] w-full overflow-hidden bg-primary-50">
     {foto_utama ? (
-      <Image
+      <img
         src={foto_utama}
         alt={nama_usaha}
-        width={400}
-        format="webp"
         loading="lazy"
         class="h-full w-full object-cover transition-transform duration-200 hover:scale-105"
       />
