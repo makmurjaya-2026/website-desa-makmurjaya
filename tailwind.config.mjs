@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import typography from '@tailwindcss/typography';
+
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
@@ -45,7 +47,59 @@ export default {
         '2xl': '1rem',
         '3xl': '1.5rem',
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            color: '#1A231E',
+            maxWidth: 'none',
+            h1: {
+              fontFamily: 'Lexend, ui-sans-serif, system-ui, sans-serif',
+              fontWeight: '700',
+              color: '#1A231E',
+            },
+            h2: {
+              fontFamily: 'Lexend, ui-sans-serif, system-ui, sans-serif',
+              fontWeight: '600',
+              color: '#1A231E',
+            },
+            h3: {
+              fontFamily: 'Lexend, ui-sans-serif, system-ui, sans-serif',
+              fontWeight: '600',
+              color: '#1A231E',
+            },
+            h4: {
+              fontFamily: 'Lexend, ui-sans-serif, system-ui, sans-serif',
+              fontWeight: '600',
+              color: '#1A231E',
+            },
+            a: {
+              color: '#1B4D3E',
+              textDecoration: 'underline',
+              '&:hover': {
+                color: '#1F5E45',
+              },
+            },
+            strong: {
+              color: '#1A231E',
+              fontWeight: '600',
+            },
+            'ol > li::marker': {
+              color: '#1B4D3E',
+              fontWeight: '600',
+            },
+            'ul > li::marker': {
+              color: '#1B4D3E',
+            },
+            blockquote: {
+              borderLeftColor: '#1B4D3E',
+              color: '#63706A',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    typography,
+  ],
 };

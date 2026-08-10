@@ -139,20 +139,18 @@ collections:
   - name: "perangkat-desa"
     label: "Perangkat Desa"
     folder: "src/content/perangkat-desa"
-    create: true
-    delete: true
+    create: false
+    delete: false
     fields:
       - { label: "Nama", name: "nama", widget: "string" }
-      - { label: "Slug URL", name: "slug", widget: "string" }
-      - { label: "Jabatan", name: "jabatan", widget: "string" }
+      - { label: "Jabatan", name: "jabatan", widget: "string",
+          hint: "Jangan ubah jabatan — struktur organisasi sudah ditetapkan" }
       - { label: "Foto", name: "foto", widget: "image", required: false,
           hint: "Maks 5MB. Format: JPG, PNG, WebP" }
-      - { label: "Urutan Tampil", name: "urutan", widget: "number", default: 99 }
-      - { label: "Level Hierarki", name: "level_hierarki", widget: "number",
-          default: 1, hint: "1=Kepala Desa, 2=Sekretaris, 3=Kepala Seksi, 4=Staf" }
-      - { label: "Atasan (slug)", name: "parent_slug", widget: "string",
-          required: false, hint: "Isi slug jabatan atasan langsung" }
       - { label: "Kontak", name: "kontak", widget: "string", required: false }
+      - { label: "Urutan Tampil", name: "urutan", widget: "hidden" }
+      - { label: "Level Hierarki", name: "level_hierarki", widget: "hidden" }
+      - { label: "Atasan (slug)", name: "parent_slug", widget: "hidden" }
       - { label: "Tugas Pokok", name: "body", widget: "markdown" }
 
   - name: "faq"

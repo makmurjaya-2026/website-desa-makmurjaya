@@ -2,8 +2,16 @@
 /**
  * OrgChart.astro
  * Menampilkan bagan struktur organisasi pemerintahan desa.
- * - Desktop (≥768px): CSS Grid layout hierarkis berdasarkan level_hierarki dan parent_slug
- * - Mobile (<768px): Daftar vertikal dengan indentasi berdasarkan level hierarki
+ * Renders a proper tree layout based on parent_slug relationships.
+ *
+ * Structure is FIXED to match the official village org chart:
+ * - BPD sits alongside Kepala Desa (advisory)
+ * - Sekretaris Desa → Kaur Keuangan, Kaur Umum dan Perencanaan
+ * - Kasi Pemerintahan → Operator
+ * - Kasi Kesejahteraan (no children)
+ * - Kasi Pelayanan (no children)
+ * - Kepala Dusun: Kadus Karajan, Kadus Cibenda
+ * - Penjaga dan Petugas Kebersihan Desa
  */
 
 import PerangkatCard from './PerangkatCard.astro';
@@ -24,7 +32,7 @@ interface Props {
 
 const { perangkatList } = Astro.props;
 
-// Build flat ordered list for mobile (DFS traversal respecting hierarchy)
+// Build tree from parent_slug relationships
 interface TreeNode extends Perangkat {
   children: TreeNode[];
 }
@@ -33,12 +41,10 @@ function buildTree(items: Perangkat[]): TreeNode[] {
   const nodeMap = new Map<string, TreeNode>();
   const roots: TreeNode[] = [];
 
-  // Create nodes
   for (const item of items) {
     nodeMap.set(item.slug, { ...item, children: [] });
   }
 
-  // Build parent-child relationships
   for (const item of items) {
     const node = nodeMap.get(item.slug)!;
     if (item.parent_slug && nodeMap.has(item.parent_slug)) {
@@ -48,7 +54,6 @@ function buildTree(items: Perangkat[]): TreeNode[] {
     }
   }
 
-  // Sort children by urutan
   for (const node of nodeMap.values()) {
     node.children.sort((a, b) => a.urutan - b.urutan);
   }
@@ -56,7 +61,7 @@ function buildTree(items: Perangkat[]): TreeNode[] {
   return roots.sort((a, b) => a.urutan - b.urutan);
 }
 
-// Flatten tree via DFS for mobile view (preserves hierarchy order)
+// Flatten for mobile
 interface FlatItem extends Perangkat {
   depth: number;
 }
@@ -73,63 +78,139 @@ function flattenTree(nodes: TreeNode[], depth: number = 0): FlatItem[] {
 const tree = buildTree(perangkatList);
 const flatList = flattenTree(tree);
 
-// Group by level for desktop grid display
-const levels = new Map<number, Perangkat[]>();
-for (const p of perangkatList) {
-  if (!levels.has(p.level_hierarki)) {
-    levels.set(p.level_hierarki, []);
-  }
-  levels.get(p.level_hierarki)!.push(p);
-}
-const sortedLevels = [...levels.entries()].sort((a, b) => a[0] - b[0]);
+// Find Kepala Desa (root)
+const kepalaDesa = tree.find(n => n.level_hierarki === 1);
+const directChildren = kepalaDesa?.children || [];
+
+// Group direct children
+const sekretaris = directChildren.find(c => c.slug === 'sekretaris-desa');
+const kasiList = directChildren.filter(c => c.jabatan.startsWith('Kasi'));
+const kadusAndOthers = directChildren.filter(c =>
+  !c.jabatan.startsWith('Kasi') && c.slug !== 'sekretaris-desa'
+);
 ---
 
-{/* Desktop: CSS Grid hierarchical layout */}
+{/* Desktop: Proper hierarchical tree layout */}
 <div class="hidden md:block" role="figure" aria-label="Bagan Struktur Organisasi Pemerintahan Desa">
-  <div class="space-y-2">
-    {sortedLevels.map(([level, members]) => (
+  <div class="flex flex-col items-center gap-0">
+
+    {/* Level 1: Kepala Desa */}
+    {kepalaDesa && (
       <div class="flex flex-col items-center">
-        {/* Connector line from above (except for top level) */}
-        {level > 1 && (
+        <div class="max-w-xs w-full">
+          <PerangkatCard
+            nama={kepalaDesa.nama}
+            jabatan={kepalaDesa.jabatan}
+            slug={kepalaDesa.slug}
+            foto={kepalaDesa.foto}
+          />
+        </div>
+
+        {/* Vertical connector */}
+        <div class="w-px h-8 bg-line" aria-hidden="true"></div>
+
+        {/* Horizontal connector spanning all branches */}
+        <div class="w-full max-w-4xl h-px bg-line" aria-hidden="true"></div>
+      </div>
+    )}
+
+    {/* Level 2: Sekretaris + Kasi row */}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl">
+      {/* Sekretaris Desa branch */}
+      {sekretaris && (
+        <div class="flex flex-col items-center">
           <div class="w-px h-6 bg-line" aria-hidden="true"></div>
-        )}
+          <PerangkatCard
+            nama={sekretaris.nama}
+            jabatan={sekretaris.jabatan}
+            slug={sekretaris.slug}
+            foto={sekretaris.foto}
+          />
+          {/* Sekretaris children (Kaur) */}
+          {sekretaris.children.length > 0 && (
+            <div class="flex flex-col items-center w-full mt-1">
+              <div class="w-px h-4 bg-line" aria-hidden="true"></div>
+              <div class="space-y-2 w-full">
+                {sekretaris.children.map((kaur) => (
+                  <div class="flex flex-col items-center">
+                    <PerangkatCard
+                      nama={kaur.nama}
+                      jabatan={kaur.jabatan}
+                      slug={kaur.slug}
+                      foto={kaur.foto}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* Horizontal connector for multiple children */}
-        {members.length > 1 && level > 1 && (
-          <div class="w-1/2 max-w-md h-px bg-line" aria-hidden="true"></div>
-        )}
+      {/* Kasi branches */}
+      {kasiList.map((kasi) => (
+        <div class="flex flex-col items-center">
+          <div class="w-px h-6 bg-line" aria-hidden="true"></div>
+          <PerangkatCard
+            nama={kasi.nama}
+            jabatan={kasi.jabatan}
+            slug={kasi.slug}
+            foto={kasi.foto}
+          />
+          {/* Kasi children (e.g. Operator under Kasi Pemerintahan) */}
+          {kasi.children.length > 0 && (
+            <div class="flex flex-col items-center w-full mt-1">
+              <div class="w-px h-4 bg-line" aria-hidden="true"></div>
+              <div class="space-y-2 w-full">
+                {kasi.children.map((child) => (
+                  <div class="flex flex-col items-center">
+                    <PerangkatCard
+                      nama={child.nama}
+                      jabatan={child.jabatan}
+                      slug={child.slug}
+                      foto={child.foto}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
 
-        {/* Level row */}
-        <div
-          class:list={[
-            'grid gap-4 justify-items-center w-full',
-            members.length === 1 && 'grid-cols-1 max-w-xs mx-auto',
-            members.length === 2 && 'grid-cols-2 max-w-lg mx-auto',
-            members.length === 3 && 'grid-cols-3 max-w-2xl mx-auto',
-            members.length >= 4 && 'grid-cols-2 lg:grid-cols-4 max-w-4xl mx-auto',
-          ]}
-        >
-          {members.sort((a, b) => a.urutan - b.urutan).map((perangkat) => (
-            <PerangkatCard
-              nama={perangkat.nama}
-              jabatan={perangkat.jabatan}
-              slug={perangkat.slug}
-              foto={perangkat.foto}
-            />
+    {/* Level 3: Kadus and other staff */}
+    {kadusAndOthers.length > 0 && (
+      <div class="flex flex-col items-center w-full max-w-4xl mt-2">
+        <div class="w-px h-6 bg-line" aria-hidden="true"></div>
+        <div class="w-full max-w-2xl h-px bg-line" aria-hidden="true"></div>
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-3xl mt-2">
+          {kadusAndOthers.map((member) => (
+            <div class="flex flex-col items-center">
+              <PerangkatCard
+                nama={member.nama}
+                jabatan={member.jabatan}
+                slug={member.slug}
+                foto={member.foto}
+              />
+            </div>
           ))}
         </div>
       </div>
-    ))}
+    )}
   </div>
 </div>
 
-{/* Mobile: Vertical list with indentation based on hierarchy depth */}
+{/* Mobile: Vertical tree with indentation */}
 <ul class="md:hidden space-y-1" role="list" aria-label="Daftar Struktur Organisasi Pemerintahan Desa">
   {flatList.map((item) => (
     <li
       role="listitem"
-      style={`padding-left: ${item.depth * 1.5}rem;`}
-      class="border-l-2 border-primary-200"
+      style={`padding-left: ${item.depth * 1.25}rem;`}
+      class:list={[
+        'border-l-2',
+        item.depth === 0 ? 'border-primary-700' : item.depth === 1 ? 'border-primary-400' : 'border-primary-200',
+      ]}
     >
       <PerangkatCard
         nama={item.nama}
