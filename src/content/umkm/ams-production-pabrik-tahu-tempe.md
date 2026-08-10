@@ -10,7 +10,7 @@ alamat: Desa Makmurjaya, Kec. Jayakerta, Kab. Karawang
 lokasi_lat: -6.119467856854007
 lokasi_lng: 107.33413982883555
 lokasi_gmaps: https://maps.app.goo.gl/EoeyF4RNz3iJ3SCA8
-foto_utama: /website-desa-makmurjaya/uploads/image_2026-08-10_142155385.png
+foto_utama: /website-desa-makmurjaya/uploads/ams-tahu.png
 ---
 
 Pabrik tahu dan tempe lokal yang memproduksi tahu segar dan tempe berkualitas setiap hari.
