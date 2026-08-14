@@ -1,5 +1,5 @@
 ---
-judul: Pengumuman Pelayanan Administrasi Desa (TEMPLATE)
+judul: Pengumuman Pelayanan Administrasi Desa
 slug: pelayanan-admin-desa-1
 kategori: Pengumuman
 tanggal: 2024-12-20
