@@ -1,5 +1,5 @@
 ---
-judul: Musyawarah Desa Penyusunan RKPDes 2025 (TEMPLATE)
+judul: Musyawarah Desa Penyusunan RKPDes 2025
 slug: musyawarah-desa-rkpdes
 kategori: Agenda
 tanggal: 2024-12-15
